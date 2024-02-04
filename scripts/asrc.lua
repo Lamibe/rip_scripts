@@ -74,5 +74,10 @@ local function open(src, dst)
 end
 
 local args = {...}
+if #args < 2 then
+	print("Usage: asrc.lua <file> <outputDir>")
+	print("The output directory have to exists")
+	return
+end
 print(args[1])
 open(args[1], args[2])
