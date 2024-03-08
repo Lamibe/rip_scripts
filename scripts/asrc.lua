@@ -4,7 +4,9 @@
 	
 	asrc.lua
 	Experimental script to extract wav files from asrc files.
-	Only tested with the Apollo Justice collection and some files don't work. 
+	Only tested with the Apollo Justice collection and some files may not work.
+	
+	This script is broken. It expect to be run with the directory of the file as the working directory and the destination have to exists
 ]]
 
 -- Check header
@@ -24,10 +26,14 @@ local function getHeader(f)
 		f:seek("set", 0x34)
 		local t = f:read(9)
 		local loop, ls, le = string.unpack("!1<BLL", t)
-		f:seek("set", 0x4E)
-		-- 0x4E have offset it seems
+		-- 0x3C : Number of unknown 8-byte chunks(in the form 0xFFFFFFFF . unknown increasing long)
+		t = f:read(4)
+		local nbUnk = string.unpack("L", t)
+		f:seek("cur", nbUnk * 8 + 0xD)
+		-- 0xD bytes after this we have the offset
 		local offset = f:read(4)
 		offset = string.unpack("<L", offset)
+		-- Followed by size of the WAV header? Not needed
 		return {
 			size = size,
 			format = format,
